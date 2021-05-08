@@ -1,0 +1,5 @@
+: 1
+name: glew
+version: 2.2.0+1
+summary: glew C library
+license: MIT
