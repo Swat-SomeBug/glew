@@ -5,7 +5,7 @@ summary: glew C library
 license: MIT
 
 description-file: UPSTREAM.README.md
-url: https://example.org/glew
+url: http://glew.sourceforge.net
 package-url: https://github.com/Swat-SomeBug/glew.git
 package-email: swat.somebug@gmail.com
 
