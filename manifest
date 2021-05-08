@@ -1,0 +1,15 @@
+: 1
+name: glew
+version: 2.2.0
+summary: glew C library
+license: MIT
+
+description-file: UPSTREAM.README.md
+url: https://example.org/glew
+package-url: https://github.com/Swat-SomeBug/glew.git
+package-email: swat.somebug@gmail.com
+
+depends: * build2 >= 0.13.0
+depends: * bpkg >= 0.13.0
+requires: ; OpenGL libraries/framework(Apple). Mostly installed with system or with SDK on windows. They are called differently on different platforms. 
+requires: ; X11 libs incase building on Linux

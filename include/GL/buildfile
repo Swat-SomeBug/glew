@@ -1,0 +1,13 @@
+pub_hdrs = {h}{**}
+
+./: $pub_hdrs
+
+# Install into the GL/ subdirectory of, say, /usr/include/
+# recreating subdirectories.
+#
+{h}{*}:
+{
+  c.options       += "-DGLEW_INCLUDE"
+  install         = include/GL/
+  install.subdirs = true
+}

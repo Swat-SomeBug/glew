@@ -1,0 +1,120 @@
+intf_libs = # Interface dependencies.
+impl_libs = # Implementation dependencies.
+
+#import impl_libs += libhello%lib{hello}
+
+# Public headers.
+#
+pub = [dir_path] ../include/GL/
+
+include $pub
+
+pub_hdrs = $($pub/pub_hdrs)
+
+lib{glew}: $pub/{$pub_hdrs}
+
+# Libs linking logic
+
+tcls = $c.target.class
+tsys = $c.target.system
+
+switch $tcls, $tsys: path.match
+{
+  case 'windows', '*msvc*'
+  {
+    c.libs = opengl32.lib glu32.lib gdi32.lib
+    libs{glew}: c.export.libs = opengl32.lib glu32.lib gdi32.lib
+    if ($config.glew.regal == true)
+    {
+      c.libs = regal32.lib # Hard assignment
+      c.poptions += -DGLEW_REGAL
+    }
+    elif ($config.glew.osmesa == true)
+    {
+      c.libs =+ osmesa.lib
+      c.poptions += -DGLEW_OSMESA
+    }
+    c.poptions += -DWIN32_MEAN_AND_LEAN -DVC_EXTRALEAN -D_CRT_SECURE_NO_WARNINGS
+  }
+  case 'windows'
+  {
+    c.libs = -nostdlib -lopengl32 -lglu32 -lgdi32
+    libs{glew}: c.export.libs = -lopengl32 -lglu32 -lgdi32
+    if ($config.glew.regal == true)
+    {
+      c.libs = -lregal # Hard assignment
+      c.poptions += -DGLEW_REGAL
+    }
+    elif ($config.glew.osmesa == true)
+    {
+      c.libs =+ -losmesa
+      c.poptions += -DGLEW_REGAL
+    }
+    c.poptions += -DWIN32_MEAN_AND_LEAN -DVC_EXTRALEAN -D_CRT_SECURE_NO_WARNING
+  }
+  case 'linux'
+  {
+    c.libs = -lGL -lX11
+    libs{glew}: c.export.libs = -lGL -lX11
+    if ($config.glew.regal == true)
+    {
+      c.libs = -lRegal # Hard assignment
+      c.poptions += -DGLEW_REGAL
+    }
+    elif ($config.glew.osmesa == true)
+    {
+      c.libs =+ -lOSMesa
+      c.poptions += -DGLEW_REGAL
+    }
+  }
+  case 'macos'
+  {
+    c.libs += -framework OpenGL
+    libs{glew}: c.export.libs = -framework OpenGL
+    if ($config.glew.regal == true)
+    {
+      c.libs = -lRegal # Hard assignment
+      c.poptions += -DGLEW_REGAL
+    }
+    elif ($config.glew.osmesa == true)
+    {
+      c.libs =+ -lOSMesa
+      c.poptions += -DGLEW_OSMESA
+    }
+  }
+}
+
+
+# Private headers and sources as well as dependencies.
+#
+lib{glew}: {h c}{**} $impl_libs $intf_libs
+
+# Build options.
+#
+out_pfx_inc = [dir_path] $out_root/include/
+src_pfx_inc = [dir_path] $src_root/include/
+out_pfx_src = [dir_path] $out_root/src/
+src_pfx_src = [dir_path] $src_root/src/
+
+c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
+              "-I$out_pfx_inc" "-I$src_pfx_inc" \
+              -DGLEW_NO_GLU
+# Export options.
+#
+lib{glew}:
+{
+  c.export.poptions =+ "-I$out_pfx_inc" "-I$src_pfx_inc" -DGLEW_NO_GLU
+  c.export.libs = $intf_libs
+}
+
+# When building requires GLEW_STATIC/GLEW_BUILD to be defined correctly in obj file
+# When consuming as static lib need definition hence exported
+# When consuming as shared lib no defintion is needed hence not exported.
+# Reason -> glew.h imports symbols (needed for consumptions) when neither GLEW_STATIC nor GLEW_BUILD is defined
+liba{glew}: c.export.poptions += -DGLEW_STATIC
+obja{glew}: c.poptions += -DGLEW_STATIC
+objs{glew}: c.poptions += -DGLEW_BUILD
+
+# Don't install private headers.
+#
+{h}{*}: install = false

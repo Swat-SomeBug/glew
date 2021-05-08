@@ -1,0 +1,8 @@
+# Test executables.
+#
+glewinfo
+
+# Testscript output directories (can be symlinks).
+#
+test
+test-*

@@ -1,0 +1,8 @@
+import libs = glew%lib{glew}
+exe{glewinfo}: {h c}{**} $libs testscript{**}
+
+if ($config.glew.glewinfoinstall == false)
+{
+  exe{glewinfo}: install = false
+}
+
